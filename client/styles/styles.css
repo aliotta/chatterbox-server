@@ -5,6 +5,10 @@ body {
     font-family: arial, sans-serif;
 }
 
+body{
+    background-image: url("http://dreamatico.com/data_images/beach/beach-6.jpg");
+}
+
 #main, #chats {
     width: 500px;
     margin: auto;
@@ -81,4 +85,10 @@ form input[type=text] {
 
 .spinner img {
     padding: 10px;
+}
+
+div #target {
+    border: 1px solid black;
+    height: 20px;
+    width: 20px;
 }

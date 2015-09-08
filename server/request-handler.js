@@ -18,11 +18,13 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 
 //curl -X POST http://127.0.0.1:3000
-var returnObject = {'/classes/room1':[],
-'/classes/room':[],
- '/classes/messages' :[],
+var returnObject = {
+ '/':[],
  'results':[]
 };
+
+var UrlParser = require("url");
+
 
 //returnObject.results = [];
 var requestHandler = function(request, response) {
@@ -40,21 +42,22 @@ var requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-  //console.log(response)
   
 
   // The outgoing status.
+
   var headers = defaultCorsHeaders;
   if(request.method === "GET"){
-    console.log("Serving request type " + request.method + " for url " + request.url);
-    if(!returnObject.hasOwnProperty(request.url)){
+  var parsed = UrlParser.parse(request.url).pathname;
+    //console.log("Serving request type " + request.method + " for url " + request.url);
+
+    if(!returnObject.hasOwnProperty(parsed)){
+  
       statusCode=404;
     } else {
-    var statusCode = 200;
-  }
-
+      statusCode = 200;
+    }
   // See the note below about CORS headers.
-    
 
   // Tell the client we are sending them plain text.
   //
@@ -65,15 +68,13 @@ var requestHandler = function(request, response) {
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(returnObject));
     
-
-
   } else if (request.method === "POST"){
+    returnObject[request.url]=true;
     headers['Content-Type'] = "text/plain";
     statusCode = 201;
     var body = ''
    
     request.on("data", function(data){
-      
       body += data.toString();
     });
     request.on("end", function(){
@@ -83,9 +84,18 @@ var requestHandler = function(request, response) {
       response.end(JSON.stringify(returnObject));
     })
 
-  } else {
+  } else if (request.method === 'OPTIONS'){
+      //var headers = {};
+      // IE8 does not allow domains to be specified, just the *
+      // headers["Access-Control-Allow-Origin"] = req.headers.origin;
+     
+     
+      response.writeHead(200, defaultCorsHeaders);
+      response.end();
+  
+   
 
-  }
+   }
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
